@@ -1,31 +1,59 @@
-import { supabase } from '@/lib/supabase'
-import StarRating from '@/components/StarRating'
-import AddReviewForm from '@/components/AddReviewForm'
+import { Metadata } from 'next';
+import { supabase } from '@/lib/supabase';
+import StarRating from '@/components/StarRating';
+import AddReviewForm from '@/components/AddReviewForm';
 
-export default async function VendorProfilePage({
-  params,
-}: {
-  params: { id: string }
-}) {
-  const { data: vendor } = await supabase
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+type Vendor = {
+  id: string;
+  name: string;
+  specialty: string;
+  location: string;
+  verified: boolean;
+};
+
+type Review = {
+  id: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  return {
+    title: `Vendor Profile - ${id}`,
+  };
+}
+
+export default async function VendorProfilePage({ params }: PageProps) {
+  const { id } = await params;
+
+  const { data: vendor, error: vendorError } = await supabase
     .from('vendors')
     .select('*')
-    .eq('id', params.id)
-    .single()
+    .eq('id', id)
+    .single<Vendor>();
 
-  const { data: reviews } = await supabase
+    const { data: rawReviews } = await supabase
     .from('reviews')
     .select('*')
-    .eq('vendor_id', params.id)
-    .order('created_at', { ascending: false })
-
-  if (!vendor) {
-    return <div className="p-6 text-red-600">Vendor not found.</div>
-  }
-
-  const reviewCount = reviews?.length ?? 0
+    .eq('vendor_id', id)
+    .order('created_at', { ascending: false }) as { data: Review[] | null };
+  
+  const reviews = rawReviews ?? [];
+  
+  const reviewCount = reviews.length;
   const avgRating =
-    reviewCount > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount : null
+    reviewCount > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount : null;
+  
+
+  if (vendorError || !vendor) {
+    return <div className="p-6 text-red-600">Vendor not found.</div>;
+   }
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6 bg-white text-[#171717]">
@@ -80,5 +108,5 @@ export default async function VendorProfilePage({
         </div>
       </details>
     </div>
-  )
+  );
 }

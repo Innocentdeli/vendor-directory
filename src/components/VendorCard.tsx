@@ -1,19 +1,13 @@
-'use client';
+'use client'
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import StarRating from './StarRating'
 import { BadgeCheck } from 'lucide-react'
+import type { Vendor } from '@/types'
 
 type Props = {
-  vendor: {
-    id: string
-    name: string
-    location: string
-    specialty: string
-    verified: boolean
-    photo_url?: string
-  }
+  vendor: Vendor
   rating?: number
 }
 
@@ -28,7 +22,7 @@ export default function VendorCard({ vendor, rating }: Props) {
     >
       <div className="relative w-full h-40">
         <Image
-          src={vendor.photo_url || fallbackImage}
+          src={vendor.image || fallbackImage}
           alt={vendor.name}
           fill
           className="object-cover"
@@ -39,7 +33,7 @@ export default function VendorCard({ vendor, rating }: Props) {
       <div className="p-4">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-semibold text-gray-800 truncate">{vendor.name}</h2>
-          {vendor.verified && (
+          {vendor.isVerified && (
             <span className="flex items-center text-green-600 text-sm font-medium">
               <BadgeCheck className="w-4 h-4 mr-1" />
               Verified
@@ -47,7 +41,9 @@ export default function VendorCard({ vendor, rating }: Props) {
           )}
         </div>
 
-        <p className="text-sm text-gray-500">{vendor.specialty} • {vendor.location}</p>
+        <p className="text-sm text-gray-500">
+          {vendor.location ?? 'Unknown Location'}
+        </p>
 
         {typeof rating === 'number' && (
           <div className="flex items-center gap-1 mt-2">
