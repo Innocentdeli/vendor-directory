@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import StarRating from '@/components/StarRating'
 import AddReviewForm from '@/components/AddReviewForm'
 
-type Vendor = {
+interface Vendor {
   id: string
   name: string
   location: string
@@ -10,14 +10,18 @@ type Vendor = {
   verified: boolean
 }
 
-type Review = {
+interface Review {
   id: string
   rating: number
   comment: string
   created_at: string
 }
 
-export default async function VendorProfilePage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: { id: string }
+}
+
+export default async function VendorProfilePage({ params }: PageProps) {
   const { data: vendor } = await supabase
     .from('vendors')
     .select('*')
@@ -34,13 +38,13 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
     return <div className="p-6 text-red-600">Vendor not found.</div>
   }
 
-  const avgRating =
-    reviews?.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null
-
   const reviewCount = reviews?.length ?? 0
+  const avgRating =
+    reviewCount > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount : null
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6 bg-white text-[#171717]">
+      {/* Vendor Header */}
       <div className="border-b pb-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-bold">{vendor.name}</h1>
         <p className="text-sm text-gray-600 mt-1">
@@ -53,25 +57,22 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
               Verified Vendor
             </span>
           )}
-          {avgRating && (
+          {avgRating !== null && (
             <div className="flex items-center gap-1">
               <StarRating value={avgRating} />
-              <span className="text-sm text-gray-500">({reviewCount} reviews)</span>
+              <span className="text-sm text-gray-500">({reviewCount} review{reviewCount !== 1 && 's'})</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Reviews */}
+      {/* Reviews List */}
       <section>
         <h2 className="text-lg font-semibold mb-3">Customer Reviews</h2>
-        {reviews?.length ? (
+        {reviewCount > 0 ? (
           <div className="space-y-4">
-            {reviews.map(r => (
-              <div
-                key={r.id}
-                className="bg-gray-50 border rounded-lg p-3 shadow-sm"
-              >
+            {reviews.map((r) => (
+              <div key={r.id} className="bg-gray-50 border rounded-lg p-3 shadow-sm">
                 <StarRating value={r.rating} />
                 <p className="text-sm text-gray-700 mt-1">{r.comment}</p>
                 <span className="text-xs text-gray-400 block mt-1">
@@ -85,7 +86,7 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
         )}
       </section>
 
-      {/* Add Review */}
+      {/* Add Review Form */}
       <details className="mt-8 group open:pb-4 transition-all">
         <summary className="cursor-pointer text-blue-600 font-medium hover:underline text-sm">
           Leave a Review
