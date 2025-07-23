@@ -17,11 +17,8 @@ interface Review {
   created_at: string
 }
 
-interface PageProps {
-  params: { id: string }
-}
-
-export default async function VendorProfilePage({ params }: PageProps) {
+// ✅ Must inline this, do NOT use a named interface like PageProps
+export default async function VendorProfilePage({ params }: { params: { id: string } }) {
   const { data: vendor } = await supabase
     .from('vendors')
     .select('*')
@@ -60,7 +57,9 @@ export default async function VendorProfilePage({ params }: PageProps) {
           {avgRating !== null && (
             <div className="flex items-center gap-1">
               <StarRating value={avgRating} />
-              <span className="text-sm text-gray-500">({reviewCount} review{reviewCount !== 1 && 's'})</span>
+              <span className="text-sm text-gray-500">
+                ({reviewCount} review{reviewCount !== 1 && 's'})
+              </span>
             </div>
           )}
         </div>
