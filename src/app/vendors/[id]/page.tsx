@@ -2,29 +2,11 @@ import { supabase } from '@/lib/supabase'
 import StarRating from '@/components/StarRating'
 import AddReviewForm from '@/components/AddReviewForm'
 
-interface Vendor {
-  id: string
-  name: string
-  location: string
-  specialty: string
-  verified: boolean
-}
-
-interface Review {
-  id: string
-  rating: number
-  comment: string
-  created_at: string
-}
-
-type Props = {
-  params: {
-    id: string
-  }
-}
-
-// ✅ This function is valid for Next.js App Router
-export default async function VendorProfilePage({ params }: Props) {
+export default async function VendorProfilePage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const { data: vendor } = await supabase
     .from('vendors')
     .select('*')
