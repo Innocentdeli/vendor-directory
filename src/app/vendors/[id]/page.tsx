@@ -17,8 +17,14 @@ interface Review {
   created_at: string
 }
 
-// ✅ Must inline this, do NOT use a named interface like PageProps
-export default async function VendorProfilePage({ params }: { params: { id: string } }) {
+type Props = {
+  params: {
+    id: string
+  }
+}
+
+// ✅ This function is valid for Next.js App Router
+export default async function VendorProfilePage({ params }: Props) {
   const { data: vendor } = await supabase
     .from('vendors')
     .select('*')
@@ -41,7 +47,6 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6 bg-white text-[#171717]">
-      {/* Vendor Header */}
       <div className="border-b pb-4 mb-4">
         <h1 className="text-2xl md:text-3xl font-bold">{vendor.name}</h1>
         <p className="text-sm text-gray-600 mt-1">
@@ -65,7 +70,6 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
         </div>
       </div>
 
-      {/* Reviews List */}
       <section>
         <h2 className="text-lg font-semibold mb-3">Customer Reviews</h2>
         {reviewCount > 0 ? (
@@ -85,7 +89,6 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
         )}
       </section>
 
-      {/* Add Review Form */}
       <details className="mt-8 group open:pb-4 transition-all">
         <summary className="cursor-pointer text-blue-600 font-medium hover:underline text-sm">
           Leave a Review
