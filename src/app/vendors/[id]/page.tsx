@@ -8,7 +8,6 @@ type Vendor = {
   location: string
   specialty: string
   verified: boolean
-  total_reviews: number | null
 }
 
 type Review = {
@@ -38,7 +37,7 @@ export default async function VendorProfilePage({ params }: { params: { id: stri
   const avgRating =
     reviews?.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null
 
-  const reviewCount = vendor.total_reviews ?? reviews?.length ?? 0
+  const reviewCount = reviews?.length ?? 0
 
   return (
     <div className="max-w-2xl mx-auto p-4 md:p-6 bg-white text-[#171717]">
